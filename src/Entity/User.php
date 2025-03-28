@@ -51,6 +51,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'user')]
     private Collection $commentaires;
 
+    #[ORM\Column]
+    private ?bool $isAdmin = null;
+
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
@@ -92,7 +95,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        if (!in_array('ROLE_USER', $roles)) {
+            $roles[] = 'ROLE_USER';
+        }
+
+       if ($this->isAdmin) {
+        if (!in_array('ROLE_ADMIN', $roles)) {
+            $roles[] = 'ROLE_ADMIN';
+        }
+    }
 
         return array_unique($roles);
     }
@@ -205,6 +216,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $commentaire->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isAdmin(): ?bool
+    {
+        return $this->isAdmin;
+    }
+
+    public function setIsAdmin(bool $isAdmin): static
+    {
+        $this->isAdmin = $isAdmin;
 
         return $this;
     }
