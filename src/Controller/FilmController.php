@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Note;
+use App\Form\NoteType;
 use App\Entity\Commentaire;
 use App\Form\CommentaireType;
 use App\Repository\FilmRepository;
@@ -32,14 +34,21 @@ final class FilmController extends AbstractController
             throw $this->createNotFoundException('Ce film n\'existe pas.');
         }
 
-        // Formulaire pour ajouter une note
+        // Créer une nouvelle note
         $note = new Note();
         $formNote = $this->createForm(NoteType::class, $note);
         $formNote->handleRequest($request);
 
+        // Si le formulaire est soumis et valide
         if ($formNote->isSubmitted() && $formNote->isValid()) {
+            // Vérification que l'utilisateur est bien connecté
+            if ($this->getUser() === null) {
+                $this->addFlash('error', 'Vous devez être connecté pour attribuer une note.');
+                return $this->redirectToRoute('app_login');
+            }
+
             $note->setFilm($film);
-            $note->setUser($this->getUser()); // Utilisateur connecté
+            $note->setUser($this->getUser());  // L'utilisateur connecté
             $em->persist($note);
             $em->flush();
 

@@ -19,6 +19,9 @@ class Note
     #[ORM\ManyToOne(inversedBy: 'note')]
     private ?Film $film = null;
 
+    #[ORM\ManyToOne(inversedBy: 'notes')]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -44,6 +47,18 @@ class Note
     public function setFilm(?Film $film): static
     {
         $this->film = $film;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
