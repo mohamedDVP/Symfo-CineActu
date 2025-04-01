@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ film.titre }}
+{% endblock %}
+
+{% block body %}
+	<h1>{{ film.titre }}</h1>
+	<p>
+		<strong>Description :</strong>
+		{{ film.synopsis }}</p>
+
+	<h2>Commentaires</h2>
+
+	{% if commentaires is empty %}
+		<p>Aucun commentaire pour l’instant.</p>
+	{% else %}
+		<ul>
+			{% for commentaire in commentaires %}
+				<li>
+					<strong>{{ commentaire.user.email }}</strong>
+					({{ commentaire.createdAt|date('d/m/Y H:i') }})
+					{% if commentaire.approuve %}
+						<p>
+							<em>(Approuvé)</em>
+						</p>
+					{% else %}
+						<p>
+							<em>(En attente d'approbation)</em>
+						</p>
+					{% endif %}
+					<p>{{ commentaire.description }}</p>
+				</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<h2>Ajouter un commentaire</h2>
+		{{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button type="submit">Envoyer</button>
+		{{ form_end(form) }}
+
+		<h2>Attribuer une note</h2>
+		{{ form_start(formNote) }}
+		{{ form_widget(formNote) }}
+		<button type="submit">Envoyer la note</button>
+		{{ form_end(formNote) }}
+	{% else %}
+		<p>
+			<a href="{{ path('app_login') }}">Connectez-vous</a>
+			pour commenter et noter.</p>
+	{% endif %}
+
+	{% if averageNote > 0 %}
+		<p>
+			<strong>Note moyenne :</strong>
+			{{ averageNote }}
+			/ 5</p>
+	{% else %}
+		<p>Aucune note n'a été attribuée à ce film.</p>
+	{% endif %}
+{% endblock %}
+
