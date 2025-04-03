@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 
@@ -43,6 +44,12 @@ class RegistrationType extends AbstractType
                         'max' => 4096,
                     ]),
                 ],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Se connecter',
+                'attr' => [
+                    'class' => 'btn btn-primary'
+                ]
             ]);
     }
 

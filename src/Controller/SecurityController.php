@@ -2,31 +2,47 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Form\LoginType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;  // Remarque : j'ai modifié cette ligne pour utiliser l'annotation correctement
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    #[Route(path: '/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    #[Route('/connexion', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
+        // Si l'utilisateur est déjà connecté, rediriger vers la page d'accueil (ou une autre page)
+        if ($this->getUser()) {
+            return $this->redirectToRoute('film_list'); // Redirection vers la page d'accueil ou la page de films après la connexion
+        }
 
-        // get the login error if there is one
+        // Création du formulaire de connexion
+        $form = $this->createForm(LoginType::class);
+
+        // Gérer la soumission du formulaire
+        $form->handleRequest($request);
+
+        // Aucun besoin de gérer l'authentification manuellement ici, Symfony s'en charge déjà
+        // Si l'utilisateur est authentifié, il sera redirigé automatiquement grâce au mécanisme de sécurité de Symfony
+
+        // Récupérer les erreurs d'authentification et le dernier email saisi (si présent)
         $error = $authenticationUtils->getLastAuthenticationError();
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
+        return $this->render('security/login.html.twig', [
+            'form' => $form->createView(),
+            'last_username' => $lastUsername,
+            'error' => $error,  // Affiche l'erreur d'authentification si elle existe
+        ]);
     }
 
-    #[Route(path: '/logout', name: 'app_logout')]
+    #[Route('/logout', name: 'app_logout', methods: ['GET'])]
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        // Cette méthode ne sera jamais appelée directement, Symfony gère automatiquement la déconnexion.
+        throw new \LogicException('Ce message ne devrait jamais être affiché.');
     }
 }

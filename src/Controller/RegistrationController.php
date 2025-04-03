@@ -23,6 +23,13 @@ final class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationType::class, $user);
         $form->handleRequest($request);
 
+        $user->setRoles(['ROLE_USER']); // Par défaut, chaque utilisateur est un simple utilisateur
+
+        // Si l'email est admin@example.com, on lui donne le rôle admin
+        if ($user->getEmail() === 'admin@cineactu.com') {
+            $user->setRoles(['ROLE_ADMIN']);
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             // Hachage du mot de passe
             $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
