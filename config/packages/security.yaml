@@ -14,30 +14,26 @@ security:
             security: false
 
         main:
-            # Ajout de custom_authenticators
             custom_authenticators:
-                - App\Security\LoginFormAuthenticator
+                - App\Security\LoginFormAuthenticator 
             provider: app_user_provider
-            # Définition explicite du entry_point
-            entry_point: App\Security\LoginFormAuthenticator  # C'est ici que l'on définit l'entrée (point d'entrée)
+            entry_point: form_login
+
+            # Configuration du formulaire de login
             form_login:
-                login_path: app_login
-                check_path: app_login
-                default_target_path: films_liste
-                username_parameter: email
-                password_parameter: password
-                csrf_token_id: authenticate
-                enable_csrf: true
-                remember_me: true  # Utiliser un booléen pour activer la fonctionnalité "remember me"
+                login_path: app_login       # route de la page de connexion
+                check_path: app_login       # route pour soumettre les identifiants
+                enable_csrf: false           # activer la protection CSRF pour le login
             logout:
                 path: app_logout
-                target: app_login
-
+                target: app_login           # route de redirection après déconnexion
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800
+                lifetime: 604800            # durée de vie du cookie (7 jours)
                 path: /
 
+
     access_control:
+        #- { path: ^/connexion, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
