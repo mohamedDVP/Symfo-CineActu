@@ -23,7 +23,7 @@ security:
             form_login:
                 login_path: app_login       # route de la page de connexion
                 check_path: app_login       # route pour soumettre les identifiants
-                enable_csrf: false           # activer la protection CSRF pour le login
+                enable_csrf: true           # activer la protection CSRF pour le login
             logout:
                 path: app_logout
                 target: app_login           # route de redirection après déconnexion
