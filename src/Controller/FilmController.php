@@ -15,7 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 final class FilmController extends AbstractController
 {
-    #[Route('/films', name: 'films_liste')]
+    #[Route('/films', name: 'app_films_liste')]
     public function index(FilmRepository $filmRepository): Response
     {
         $films = $filmRepository->findAll(); // Récupère tous les films de la base
@@ -25,7 +25,7 @@ final class FilmController extends AbstractController
         ]);
     }
 
-    #[Route('/film/{id}', name: 'film_detail')]
+    #[Route('/film/{id}', name: 'app_film_detail')]
     public function detail(int $id, FilmRepository $filmRepository, Request $request, EntityManagerInterface $em): Response
     {
         $film = $filmRepository->find($id);

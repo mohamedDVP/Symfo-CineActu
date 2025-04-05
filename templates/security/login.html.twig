@@ -1,25 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion
-{% endblock %}
+{% block title %}Log in!{% endblock %}
 
 {% block body %}
-	<h1>Connexion</h1>
+<form action="{{ path('app_login') }}" method="post">
+	<input type="email" name="email" value="{{ last_username }}" required autofocus>
+	<input
+	type="password" name="password" required>
 
-	{{ form_start(form) }}
-	{{ form_row(form.email) }}
-	{{ form_row(form.password) }}
-	<!-- Le champ CSRF doit être inclus -->
-	{{ form_end(form) }}
+	<!-- Ajouter ici le token CSRF -->
+	<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-	{% if error %}
-		<div class="alert alert-danger">
-			<strong>Erreur !</strong>
-			{{ error.messageKey|trans(error.messageData, 'security') }}
-		</div>
-	{% endif %}
+	<button type="submit">Se connecter</button>
+</form>
 
-	<p>Dernier nom d'utilisateur :
-		{{ last_username }}</p>
+
 {% endblock %}
-
