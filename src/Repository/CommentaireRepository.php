@@ -16,20 +16,17 @@ class CommentaireRepository extends ServiceEntityRepository
         parent::__construct($registry, Commentaire::class);
     }
 
-    //    /**
-    //     * @return Commentaire[] Returns an array of Commentaire objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findApprovedByFilm($film): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.film = :film')
+            ->andWhere('c.approuve = :approuve')
+            ->setParameter('film', $film)
+            ->setParameter('approuve', true)
+            ->orderBy('c.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    public function findOneBySomeField($value): ?Commentaire
     //    {

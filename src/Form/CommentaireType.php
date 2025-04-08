@@ -16,20 +16,12 @@ class CommentaireType extends AbstractType
     {
         $builder
             ->add('description')
-            ->add('createdAt', null, [
-                'widget' => 'single_text',
-            ])
             ->add('publishedAt', null, [
                 'widget' => 'single_text',
             ])
-            ->add('approuve')
-            ->add('film', EntityType::class, [
-                'class' => Film::class,
-                'choice_label' => 'id',
-            ])
             ->add('user', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
+                'choice_label' => 'login',
             ])
         ;
     }

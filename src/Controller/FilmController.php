@@ -2,11 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Film;
 use App\Entity\Note;
 use App\Form\NoteType;
 use App\Entity\Commentaire;
 use App\Form\CommentaireType;
+use App\Form\CommentaireNoteType;
+use App\Repository\CommentaireRepository;
 use App\Repository\FilmRepository;
+use App\Repository\NoteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,45 +30,60 @@ final class FilmController extends AbstractController
     }
 
     #[Route('/film/{id}', name: 'app_film_detail')]
-    public function detail(int $id, FilmRepository $filmRepository, Request $request, EntityManagerInterface $em): Response
-    {
-        $film = $filmRepository->find($id);
+    public function detail(
+        int $id,
+        FilmRepository $filmRepository,
+        Request $request,
+        EntityManagerInterface $em,
+        NoteRepository $noteRepository,
+        CommentaireRepository $commentaireRepo
+    ): Response {
+        $film = $em->getRepository(Film::class)->find($id);
 
         if (!$film) {
-            throw $this->createNotFoundException('Ce film n\'existe pas.');
+            throw $this->createNotFoundException('Film non trouvé');
         }
 
-        // Créer une nouvelle note
-        $note = new Note();
-        $formNote = $this->createForm(NoteType::class, $note);
-        $formNote->handleRequest($request);
+        $commentaires = $commentaireRepo->findApprovedByFilm($film);
 
-        // Si le formulaire est soumis et valide
-        if ($formNote->isSubmitted() && $formNote->isValid()) {
-            // Vérification que l'utilisateur est bien connecté
-            if ($this->getUser() === null) {
-                $this->addFlash('error', 'Vous devez être connecté pour attribuer une note.');
+        $commentaire = new Commentaire();
+        $form = $this->createForm(CommentaireNoteType::class, $commentaire);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->getUser()) {
+                $this->addFlash('error', 'Vous devez être connecté pour commenter.');
                 return $this->redirectToRoute('app_login');
             }
 
+            // Créer la note
+            $noteValue = $form->get('note')->getData();
+            $note = new Note();
+            $note->setNoteValue($noteValue);
             $note->setFilm($film);
-            $note->setUser($this->getUser());  // L'utilisateur connecté
+            $note->setUser($this->getUser());
+
+            // Associer la note au commentaire
+            $commentaire->setNote($note);
+            $commentaire->setFilm($film);
+            $commentaire->setUser($this->getUser());
+            $commentaire->setCreatedAt(new \DateTimeImmutable());
+            $commentaire->setApprouve(false); // En attente de validation admin
+
             $em->persist($note);
+            $em->persist($commentaire);
             $em->flush();
 
-            return $this->redirectToRoute('film_detail', ['id' => $id]);
+            $this->addFlash('success', 'Votre commentaire a été soumis pour validation.');
+            return $this->redirectToRoute('app_film_detail', ['id' => $film->getId()]);
         }
-
-        // Récupérer la note moyenne
-        $averageNote = $film->getNotes()->count() > 0 ? array_sum(array_map(function ($note) {
-            return $note->getNote();
-        }, $film->getNotes()->toArray())) / $film->getNotes()->count() : 0;
 
         return $this->render('film/detail.html.twig', [
             'film' => $film,
-            'commentaires' => $film->getCommentaires(),
-            'formNote' => $formNote->createView(),
-            'averageNote' => round($averageNote, 2),  // Note moyenne
+            'commentairesOK' => $commentaires,
+            'commentaires' => $commentaire,
+            'averageNote' => $noteRepository->getAverageNoteForFilm($film),
+            'form' => $form->createView(),
         ]);
     }
 }

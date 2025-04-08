@@ -41,7 +41,7 @@ class Film
      * @var Collection<int, Realisateur>
      */
     #[ORM\ManyToMany(targetEntity: Realisateur::class, inversedBy: 'films')]
-    private Collection $Realisateur;
+    private Collection $realisateur;
 
     /**
      * @var Collection<int, Note>
@@ -58,7 +58,7 @@ class Film
     public function __construct()
     {
         $this->genre = new ArrayCollection();
-        $this->Realisateur = new ArrayCollection();
+        $this->realisateur = new ArrayCollection();
         $this->note = new ArrayCollection();
         $this->commentaire = new ArrayCollection();
     }
@@ -157,13 +157,13 @@ class Film
      */
     public function getRealisateur(): Collection
     {
-        return $this->Realisateur;
+        return $this->realisateur;
     }
 
     public function addRealisateur(Realisateur $realisateur): static
     {
-        if (!$this->Realisateur->contains($realisateur)) {
-            $this->Realisateur->add($realisateur);
+        if (!$this->realisateur->contains($realisateur)) {
+            $this->realisateur->add($realisateur);
         }
 
         return $this;
@@ -171,7 +171,7 @@ class Film
 
     public function removeRealisateur(Realisateur $realisateur): static
     {
-        $this->Realisateur->removeElement($realisateur);
+        $this->realisateur->removeElement($realisateur);
 
         return $this;
     }
