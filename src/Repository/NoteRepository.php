@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Film;
 use App\Entity\Note;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Note>
@@ -16,20 +17,16 @@ class NoteRepository extends ServiceEntityRepository
         parent::__construct($registry, Note::class);
     }
 
-    //    /**
-    //     * @return Note[] Returns an array of Note objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('n')
-    //            ->andWhere('n.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('n.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function getAverageNoteForFilm(Film $film): ?float
+    {
+        $qb = $this->createQueryBuilder('n')
+            ->select('AVG(n.noteValue)') // Calcule la moyenne des notes
+            ->where('n.film = :film')
+            ->setParameter('film', $film)
+            ->getQuery();
+
+        return $qb->getSingleScalarResult(); // Retourne la moyenne
+    }
 
     //    public function findOneBySomeField($value): ?Note
     //    {

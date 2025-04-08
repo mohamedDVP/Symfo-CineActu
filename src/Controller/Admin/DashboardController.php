@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Commentaire;
 use App\Entity\Film;
 use App\Entity\Note;
 use App\Entity\Genre;
@@ -44,7 +45,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Films', 'fas fa-film', Film::class);
         yield MenuItem::linkToCrud('Genre', 'fas fa-list', Genre::class);
-        yield MenuItem::linkToCrud('Commentaires', 'fas fa-comment', Genre::class);
+        yield MenuItem::linkToCrud('Commentaires', 'fas fa-comment', Commentaire::class);
         yield MenuItem::linkToCrud('Note', 'fas fa-star', Note::class);
         yield MenuItem::linkToCrud('Realisateur', 'fas fa-clapperboard', Realisateur::class);
         yield MenuItem::linkToCrud('Utilisateur', 'fas fa-user', User::class);

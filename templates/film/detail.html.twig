@@ -6,60 +6,86 @@
 
 {% block body %}
 	<h1>{{ film.titre }}</h1>
+	{% if film.affiche %}
+		<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" alt="{{ film.titre }}" style="width: 200px; height: auto;">
+	{% endif %}
 	<p>
 		<strong>Description :</strong>
-		{{ film.synopsis }}</p>
-
+		{{ film.synopsis }}
+	</p>
+	<p>
+		<strong>Durée :</strong>
+		{{ film.duree|date('H:i') }}
+	</p>
+	<p>
+		<strong>Réalisateur(s) :</strong>
+		{% for real in film.realisateur %}
+			{{ real.nom }}
+			{% if not loop.last %}, {% endif %}
+		{% else %}
+			<em>Aucun réalisateur</em>
+		{% endfor %}
+	</p>
+	<p>
+		<strong>Genres :</strong>
+		{% for g in film.genre %}
+			{{ g.libelle }}
+			{% if not loop.last %}, {% endif %}
+		{% else %}
+			<em>Aucun genre</em>
+		{% endfor %}
+	</p>
+	<p>
+		{% if averageNote is not null %}
+			<p>
+				<strong>Note moyenne :</strong>
+				{{ averageNote|number_format(1) }}/5
+			</p>
+		{% else %}
+			<p>
+				<em>Ce film n'a pas encore été noté.</em>
+			</p>
+		{% endif %}
+	</p>
+	
 	<h2>Commentaires</h2>
 
-	{% if commentaires is empty %}
+	{% if commentairesOK is empty %}
 		<p>Aucun commentaire pour l’instant.</p>
 	{% else %}
 		<ul>
-			{% for commentaire in commentaires %}
+			{% for commentaire in commentairesOK %}
 				<li>
 					<strong>{{ commentaire.user.email }}</strong>
-					({{ commentaire.createdAt|date('d/m/Y H:i') }})
-					{% if commentaire.approuve %}
-						<p>
-							<em>(Approuvé)</em>
-						</p>
-					{% else %}
-						<p>
-							<em>(En attente d'approbation)</em>
-						</p>
-					{% endif %}
+					<p>
+						<em>({{ commentaire.createdAt|date('d/m/Y H:i') }})</em>
+					</p>
 					<p>{{ commentaire.description }}</p>
+					{% if commentaire.note %}
+						<p>Note :
+							{{ commentaire.note.noteValue }}/5</p>
+					{% endif %}
 				</li>
 			{% endfor %}
 		</ul>
 	{% endif %}
 
-	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
-		<h2>Ajouter un commentaire</h2>
-		{{ form_start(form) }}
-		{{ form_widget(form) }}
-		<button type="submit">Envoyer</button>
-		{{ form_end(form) }}
 
-		<h2>Attribuer une note</h2>
-		{{ form_start(formNote) }}
-		{{ form_widget(formNote) }}
-		<button type="submit">Envoyer la note</button>
-		{{ form_end(formNote) }}
+	{% if app.user %}
+		<h2>Ajouter un commentaire</h2>
+
+		{{ form_start(form) }}
+		{{ form_row(form.description) }}
+		{{ form_row(form.publishedAt) }}
+		{{ form_row(form.note) }}
+		{{ form_row(form.Envoyer) }}
+		{{ form_end(form) }}
 	{% else %}
 		<p>
 			<a href="{{ path('app_login') }}">Connectez-vous</a>
-			pour commenter et noter.</p>
+			pour commenter et noter ce film.
+		</p>
 	{% endif %}
 
-	{% if averageNote > 0 %}
-		<p>
-			<strong>Note moyenne :</strong>
-			{{ averageNote }}
-			/ 5</p>
-	{% else %}
-		<p>Aucune note n'a été attribuée à ce film.</p>
-	{% endif %}
 {% endblock %}
 
