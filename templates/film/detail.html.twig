@@ -3,89 +3,191 @@
 {% block title %}
 	{{ film.titre }}
 {% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+console.log("JS chargé ✅");
+
+const stars = document.querySelectorAll("#star-rating i");
+const noteField = document.querySelector("[name='{{ form.note.vars.full_name }}']");
+let selected = 0;
+
+function highlightStars(value) {
+stars.forEach(star => {
+const val = parseInt(star.dataset.value);
+
+star.classList.remove("bi-star-fill", "bi-star", "selected", "hovered");
+
+if (val <= value) {
+star.classList.add("bi-star-fill", "hovered");
+} else {
+star.classList.add("bi-star");
+}
+});
+}
+
+function selectStars(value) {
+selected = value;
+noteField.value = selected;
+
+stars.forEach(star => {
+const val = parseInt(star.dataset.value);
+
+star.classList.remove("selected", "bi-star", "bi-star-fill");
+
+if (val <= selected) {
+star.classList.add("bi-star-fill", "selected");
+} else {
+star.classList.add("bi-star");
+}
+});
+}
+
+stars.forEach(star => {
+star.addEventListener("mouseenter", function () {
+highlightStars(parseInt(this.dataset.value));
+});
+
+star.addEventListener("mouseleave", function () {
+highlightStars(selected);
+});
+
+star.addEventListener("click", function () {
+selectStars(parseInt(this.dataset.value));
+});
+});
+
+// Pour réinitialiser l'état si une note est déjà présente
+if (noteField.value) {
+selectStars(parseInt(noteField.value));
+}
+});
+	</script>
+{% endblock %}
+
+
 
 {% block body %}
-	<h1>{{ film.titre }}</h1>
-	{% if film.affiche %}
-		<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" alt="{{ film.titre }}" style="width: 200px; height: auto;">
-	{% endif %}
-	<p>
-		<strong>Description :</strong>
-		{{ film.synopsis }}
-	</p>
-	<p>
-		<strong>Durée :</strong>
-		{{ film.duree|date('H:i') }}
-	</p>
-	<p>
-		<strong>Réalisateur(s) :</strong>
-		{% for real in film.realisateur %}
-			{{ real.nom }}
-			{% if not loop.last %}, {% endif %}
-		{% else %}
-			<em>Aucun réalisateur</em>
-		{% endfor %}
-	</p>
-	<p>
-		<strong>Genres :</strong>
-		{% for g in film.genre %}
-			{{ g.libelle }}
-			{% if not loop.last %}, {% endif %}
-		{% else %}
-			<em>Aucun genre</em>
-		{% endfor %}
-	</p>
-	<p>
-		{% if averageNote is not null %}
-			<p>
-				<strong>Note moyenne :</strong>
-				{{ averageNote|number_format(1) }}/5
-			</p>
-		{% else %}
-			<p>
-				<em>Ce film n'a pas encore été noté.</em>
-			</p>
-		{% endif %}
-	</p>
-	
-	<h2>Commentaires</h2>
+	<div class="container my-5">
 
-	{% if commentairesOK is empty %}
-		<p>Aucun commentaire pour l’instant.</p>
-	{% else %}
-		<ul>
-			{% for commentaire in commentairesOK %}
-				<li>
-					<strong>{{ commentaire.user.email }}</strong>
-					<p>
-						<em>({{ commentaire.createdAt|date('d/m/Y H:i') }})</em>
-					</p>
-					<p>{{ commentaire.description }}</p>
-					{% if commentaire.note %}
-						<p>Note :
-							{{ commentaire.note.noteValue }}/5</p>
+		<div class="text-center mb-4">
+			<h1 class="display-4">{{ film.titre }}</h1>
+
+			{% if film.affiche %}
+				<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" alt="{{ film.titre }}" class="img-fluid rounded shadow" style="max-width: 300px;">
+			{% endif %}
+		</div>
+
+		<div class="mb-4">
+			<p>
+				<strong>Description :</strong>
+				{{ film.synopsis }}</p>
+			<p>
+				<strong>Durée :</strong>
+				{{ film.duree|date('H\hi') }}</p>
+			<p>
+				<strong>Réalisateur(s) :</strong>
+				{% for real in film.realisateur %}
+					{{ real.nom }}
+					{% if not loop.last %},
 					{% endif %}
-				</li>
-			{% endfor %}
-		</ul>
-	{% endif %}
+				{% else %}
+					<em>Aucun réalisateur</em>
+				{% endfor %}
+			</p>
+			<p>
+				<strong>Genres :</strong>
+				{% for g in film.genre %}
+					{{ g.libelle }}
+					{% if not loop.last %},
+					{% endif %}
+				{% else %}
+					<em>Aucun genre</em>
+				{% endfor %}
+			</p>
+
+			{% if commentaire.note is defined and commentaire.note is not null %}
+				{% set full = commentaire.note.noteValue|round(0, 'floor') %}
+				{% set half = (commentaire.note.noteValue - full) >= 0.5 ? 1 : 0 %}
+				{% set empty = 5 - full - half %}
+
+				<span class="text-warning">
+					{% for i in 1..full %}
+						<i class="bi bi-star-fill"></i>
+					{% endfor %}
+					{% if half %}
+						<i class="bi bi-star-half"></i>
+					{% endif %}
+					{% for i in 1..empty %}
+						<i class="bi bi-star"></i>
+					{% endfor %}
+				</span>
+			{% else %}
+				<span class="text-muted">Pas de note</span>
+			{% endif %}
 
 
-	{% if app.user %}
-		<h2>Ajouter un commentaire</h2>
 
-		{{ form_start(form) }}
-		{{ form_row(form.description) }}
-		{{ form_row(form.publishedAt) }}
-		{{ form_row(form.note) }}
-		{{ form_row(form.Envoyer) }}
-		{{ form_end(form) }}
-	{% else %}
-		<p>
-			<a href="{{ path('app_login') }}">Connectez-vous</a>
-			pour commenter et noter ce film.
-		</p>
-	{% endif %}
+		<h2 class="mb-3">Commentaires</h2>
 
+		{% if commentairesOK is empty %}
+			<div class="alert alert-secondary">Aucun commentaire pour l’instant.</div>
+		{% else %}
+			<div class="list-group mb-4">
+				{% for commentaire in commentairesOK %}
+					<div class="list-group-item">
+						<div class="d-flex justify-content-between">
+							<strong>{{ commentaire.user.email }}</strong>
+							<small class="text-muted">{{ commentaire.createdAt|date('d/m/Y H:i') }}</small>
+						</div>
+						<p class="mb-1 mt-2">{{ commentaire.description }}</p>
+						{% if commentaire.note %}
+							<div class="text-warning">Note :
+								{{ commentaire.note.noteValue }}/5</div>
+						{% endif %}
+					</div>
+				{% endfor %}
+			</div>
+		{% endif %}
+
+		{% if app.user %}
+			<h2 class="mb-3">Ajouter un commentaire</h2>
+			<div class="card p-4 mb-5">
+				{{ form_start(form) }}
+
+				<div class="mb-3">
+					{{ form_row(form.description) }}
+				</div>
+
+				<div class="mb-3">
+					{{ form_row(form.publishedAt) }}
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Note</label>
+					<div id="star-rating" class="text-warning fs-3">
+						{% for i in 1..5 %}
+							<i class="bi bi-star" data-value="{{ i }}" style="cursor: pointer;"></i>
+						{% endfor %}
+					</div>
+					{{ form_widget(form.note, {'attr': {'type': 'hidden'}}) }}
+				</div>
+				<div class="text-end">
+					{{ form_row(form.Envoyer) }}
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		{% else %}
+			<div class="alert alert-info">
+				<a href="{{ path('app_login') }}" class="alert-link">Connectez-vous</a>
+				pour commenter et noter ce film.
+			</div>
+		{% endif %}
+
+
+
+	</div>
 {% endblock %}
 
