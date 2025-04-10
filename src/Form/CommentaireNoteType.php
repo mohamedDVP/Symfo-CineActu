@@ -19,8 +19,9 @@ class CommentaireNoteType extends AbstractType
     {
         $builder
             ->add('description')
-            ->add('publishedAt', null, [
-                'widget' => 'single_text',
+            ->add('publishedAt', HiddenType::class, [
+                'data' => new \DateTimeImmutable()->format('Y-m-d H:i:s'), // ou à gérer dans le contrôleur
+                'mapped' => false // si tu veux le gérer manuellement
             ])
             // Ajout du champ note : association avec l'entité Note
             ->add('note', HiddenType::class, [

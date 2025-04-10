@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Commentaire
 {
     #[ORM\Id]
@@ -69,10 +70,12 @@ class Commentaire
         return $this->publishedAt;
     }
 
-    public function setPublishedAt(\DateTimeImmutable $publishedAt): static
+    #[ORM\PrePersist]
+    public function setPublishedAt(): static
     {
-        $this->publishedAt = $publishedAt;
-
+        if ($this->publishedAt === null) {
+            $this->publishedAt = new \DateTimeImmutable();
+        }
         return $this;
     }
 
