@@ -4,62 +4,65 @@
 {% endblock %}
 
 {% block body %}
-	<h1>🎬 Liste des films</h1>
+	<div class="container">
+		<h1>🎬 Liste des films</h1>
 
-	{% for film in films %}
-		<div class="film-card" style="margin-bottom: 2rem;">
-			<h2>{{ film.titre }}</h2>
-			{% if film.affiche %}
-				<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" alt="{{ film.titre }}" style="width: 100px; height: auto;">
-			{% endif %}
-			<p>
-				<strong>Durée :</strong>
-				{{ film.duree|date('H:i') }}</p>
-
-			<p>
-				<strong>Réalisateur(s) :</strong>
-				{% for real in film.realisateur %}
-					{{ real.nom }}
-					{% if not loop.last %},
-					{% endif %}
-				{% else %}
-					<em>Aucun réalisateur</em>
-				{% endfor %}
-			</p>
-
-			<p>
-				<strong>Genres :</strong>
-				{% for g in film.genre %}
-					{{ g.libelle }}
-					{% if not loop.last %},
-					{% endif %}
-				{% else %}
-					<em>Aucun genre</em>
-				{% endfor %}
-			</p>
-
-			<p>
-				<strong>Note moyenne :</strong>
-				{% set total = 0 %}
-				{% set count = film.note|length %}
-				{% for n in film.note %}
-					{% set total = total + n.noteValue %}
-				{% endfor %}
-				{% if count > 0 %}
-					{{ (total / count)|number_format(1) }}/5
-				{% else %}
-					<em>Non noté</em>
+		{% for film in films %}
+			<div class="film-card" style="margin-bottom: 2rem;">
+				<h2>{{ film.titre }}</h2>
+				{% if film.affiche %}
+					<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" alt="{{ film.titre }}" style="width: 100px; height: auto;">
 				{% endif %}
-			</p>
+				<p>
+					<strong>Durée :</strong>
+					{{ film.duree|date('H:i') }}</p>
 
-			<p>
-				<strong>Synopsis :</strong>
-				{{ film.synopsis|u.truncate(200, '...') }}</p>
+				<p>
+					<strong>Réalisateur(s) :</strong>
+					{% for real in film.realisateur %}
+						{{ real.nom }}
+						{% if not loop.last %},
+						{% endif %}
+					{% else %}
+						<em>Aucun réalisateur</em>
+					{% endfor %}
+				</p>
 
-			<a href="{{ path('app_film_detail', { id: film.id }) }}" class="btn btn-primary">Voir les détails</a>
-		</div>
-	{% else %}
-		<p>Aucun film trouvé.</p>
-	{% endfor %}
+				<p>
+					<strong>Genres :</strong>
+					{% for g in film.genre %}
+						{{ g.libelle }}
+						{% if not loop.last %},
+						{% endif %}
+					{% else %}
+						<em>Aucun genre</em>
+					{% endfor %}
+				</p>
+
+				<p>
+					<strong>Note moyenne :</strong>
+					{% set total = 0 %}
+					{% set count = film.note|length %}
+					{% for n in film.note %}
+						{% set total = total + n.noteValue %}
+					{% endfor %}
+					{% if count > 0 %}
+						{{ (total / count)|number_format(1) }}/5
+					{% else %}
+						<em>Non noté</em>
+					{% endif %}
+				</p>
+
+				<p>
+					<strong>Synopsis :</strong>
+					{{ film.synopsis|u.truncate(200, '...') }}</p>
+
+				<a href="{{ path('app_film_detail', { id: film.id }) }}" class="btn btn-primary">Voir les détails</a>
+			</div>
+		{% else %}
+			<p>Aucun film trouvé.</p>
+		{% endfor %}
+		<hr class="hr"/>
+	</div>
 {% endblock %}
 
