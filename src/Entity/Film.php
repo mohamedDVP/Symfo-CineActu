@@ -55,12 +55,19 @@ class Film
     #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'film')]
     private Collection $commentaire;
 
+    /**
+     * @var Collection<int, Acteur>
+     */
+    #[ORM\ManyToMany(targetEntity: Acteur::class, inversedBy: 'films')]
+    private Collection $acteur;
+
     public function __construct()
     {
         $this->genre = new ArrayCollection();
         $this->realisateur = new ArrayCollection();
         $this->note = new ArrayCollection();
         $this->commentaire = new ArrayCollection();
+        $this->acteur = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -232,6 +239,30 @@ class Film
                 $commentaire->setFilm(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Acteur>
+     */
+    public function getActeur(): Collection
+    {
+        return $this->acteur;
+    }
+
+    public function addActeur(Acteur $acteur): static
+    {
+        if (!$this->acteur->contains($acteur)) {
+            $this->acteur->add($acteur);
+        }
+
+        return $this;
+    }
+
+    public function removeActeur(Acteur $acteur): static
+    {
+        $this->acteur->removeElement($acteur);
 
         return $this;
     }
