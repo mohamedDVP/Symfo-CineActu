@@ -56,6 +56,11 @@ class FilmCrudController extends AbstractCrudController
                     'multiple' => true,
                     'expanded' => true,
                 ]),
+            AssociationField::new('acteur')
+                ->setFormTypeOptions([
+                    'multiple' => true,
+                    'expanded' => true,
+                ]),
         ];
     }
    
