@@ -5,6 +5,7 @@ namespace App\Security;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -22,12 +23,10 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
     public const LOGIN_ROUTE = 'app_login';
-    private UrlGeneratorInterface $urlGenerator;
-
-    public function __construct(UrlGeneratorInterface $urlGenerator)
-    {
-        $this->urlGenerator = $urlGenerator;
-    }
+        public function __construct(
+        private RouterInterface $router,
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
 
     public function authenticate(Request $request): Passport
     {
@@ -47,20 +46,17 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
-
-        
         $user = $token->getUser();
 
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return new RedirectResponse($this->urlGenerator->generate('admin')); // Route admin
+            return new RedirectResponse($this->router->generate('admin'));
         }
-        dump($request->getSession()->get('_security.main.target_path'));
 
-        return new RedirectResponse($this->urlGenerator->generate('app_profil'));
+        if (in_array('ROLE_USER', $user->getRoles(), true)) {
+            return new RedirectResponse($this->router->generate('app_profil'));
+        }
+
+        return new RedirectResponse($this->router->generate('app_login'));
     }
 
     protected function getLoginUrl(Request $request): string

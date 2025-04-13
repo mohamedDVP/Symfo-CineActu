@@ -3,3 +3,12 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+
+admin_dashboard:
+    path: /admin
+    controller: App\Controller\AdminController::dashboard
+
+user_profile:
+    path: /profil
+    controller: App\Controller\UserController::profile
