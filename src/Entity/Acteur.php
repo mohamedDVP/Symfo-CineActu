@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\ActeurRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: ActeurRepository::class)]
 class Acteur
@@ -25,8 +28,8 @@ class Acteur
     #[ORM\Column(length: 255)]
     private ?string $nationalite = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_naissance = null;
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ? DateTimeInterface $date_naissance = null;
 
     /**
      * @var Collection<int, Film>
@@ -80,12 +83,12 @@ class Acteur
         return $this;
     }
 
-    public function getDateNaissance(): ?\DateTimeInterface
+    public function getDateNaissance(): ?DateTimeInterface
     {
         return $this->date_naissance;
     }
 
-    public function setDateNaissance(\DateTimeInterface $date_naissance): static
+    public function setDateNaissance(DateTimeInterface $date_naissance): static
     {
         $this->date_naissance = $date_naissance;
 
