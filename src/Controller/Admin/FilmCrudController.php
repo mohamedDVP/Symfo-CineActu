@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -30,8 +31,12 @@ class FilmCrudController extends AbstractCrudController
             TextField::new('titre'),
             DateField::new('dateSortie')
                 ->setFormat('dd/MM/yyyy'),
-            TimeField::new('duree')
-                ->setFormat('HH:mm'),
+            IntegerField::new('duree')
+                ->setFormTypeOptions([
+                    'attr' => [
+                        'placeholder' => 'Durée en minutes',
+                    ],
+                ]),
             ImageField::new('affiche')
                 ->setBasePath('uploads/affiche')
                 ->setUploadDir('public/assets/uploads/affiche')

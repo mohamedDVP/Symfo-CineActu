@@ -85,8 +85,18 @@ selectStars(parseInt(noteField.value));
 				{{ film.synopsis }}</p>
 			<p>
 				<strong>Durée :</strong>
-				{{ film.duree|date('H\hi') }}</p>
+				{# Récupère le nombre de secondes #}
+				{% set total_minutes = film.duree %}
+				{% set heures = (total_minutes // 60) %}
+				{% set minutes = (total_minutes % 60) %}
+				{{ heures }}h{{ "%02d"|format(minutes) }}min
+			</p>
 			<p>
+				<strong>Date de sortie :</strong>
+				{{ film.dateSortie|date('d/m/Y') }}
+			</p>
+			<p>
+
 				<strong>Réalisateur(s) :</strong>
 				{% for real in film.realisateur %}
 					{{ real.nom }}
@@ -106,26 +116,41 @@ selectStars(parseInt(noteField.value));
 					<em>Aucun genre</em>
 				{% endfor %}
 			</p>
-
-			{% if commentaire.note is defined and commentaire.note is not null %}
-				{% set full = commentaire.note.noteValue|round(0, 'floor') %}
-				{% set half = (commentaire.note.noteValue - full) >= 0.5 ? 1 : 0 %}
-				{% set empty = 5 - full - half %}
-
-				<span class="text-warning">
-					{% for i in 1..full %}
-						<i class="bi bi-star-fill"></i>
-					{% endfor %}
-					{% if half %}
-						<i class="bi bi-star-half"></i>
+			<p>
+				<strong>Acteurs :</strong>
+				{% for a in film.acteur %}
+					{{ a.nom }} {{ a.prenom }}
+					{% if not loop.last %},
 					{% endif %}
-					{% for i in 1..empty %}
-						<i class="bi bi-star"></i>
-					{% endfor %}
-				</span>
-			{% else %}
-				<span class="text-muted">Pas de note</span>
+				{% else %}
+					<em>Aucun acteur</em>
+				{% endfor %}
+			</p>
+
+{% if averageNote is not null %}
+	{% set full = averageNote|round(0, 'floor') %}
+	{% set half = (averageNote - full) >= 0.5 ? 1 : 0 %}
+	{% set empty = 5 - full - half %}
+
+	<div class="mb-3">
+		<p class="fw-bold mb-1">Note moyenne :</p>
+		<span class="text-warning">
+			{% for i in 1..full %}
+				<i class="bi bi-star-fill"></i>
+			{% endfor %}
+			{% if half %}
+				<i class="bi bi-star-half"></i>
 			{% endif %}
+			{% for i in 1..empty %}
+				<i class="bi bi-star"></i>
+			{% endfor %}
+		</span>
+		<small class="text-muted">({{ averageNote|number_format(1, '.', '') }}/5)</small>
+	</div>
+{% else %}
+	<p class="text-muted">Ce film n’a pas encore de note.</p>
+{% endif %}
+
 
 
 

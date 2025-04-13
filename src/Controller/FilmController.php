@@ -11,6 +11,7 @@ use App\Form\CommentaireNoteType;
 use App\Repository\CommentaireRepository;
 use App\Repository\FilmRepository;
 use App\Repository\NoteRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,14 +21,22 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 final class FilmController extends AbstractController
 {
     #[Route('/films', name: 'app_films_liste')]
-    public function index(FilmRepository $filmRepository): Response
+    public function index(FilmRepository $filmRepository, NoteRepository $noteRepository): Response
     {
-        $films = $filmRepository->findAll(); // Récupère tous les films de la base
+        $films = $filmRepository->findAll();
+
+        // On crée un tableau associatif [film => moyenne]
+        $averageNotes = [];
+        foreach ($films as $film) {
+            $averageNotes[$film->getId()] = $noteRepository->getAverageNoteForFilm($film);
+        }
 
         return $this->render('film/index.html.twig', [
             'films' => $films,
+            'averageNotes' => $averageNotes,
         ]);
     }
+
 
     #[Route('/film/{id}', name: 'app_film_detail')]
     public function detail(

@@ -29,6 +29,9 @@ class CommentaireNoteType extends AbstractType
             ])
             ->add('Envoyer', SubmitType::class, [
                 'label' => 'Envoyer',
+                'attr' => [
+                    'class' => 'btn btn-primary',
+                ],
             ]);
     }
 

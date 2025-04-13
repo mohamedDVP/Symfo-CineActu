@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-	<div class="container">
+	{# <div class="container">
 		<h1>🎬 Liste des films</h1>
 
 		{% for film in films %}
@@ -38,19 +38,40 @@
 						<em>Aucun genre</em>
 					{% endfor %}
 				</p>
-
 				<p>
-					<strong>Note moyenne :</strong>
-					{% set total = 0 %}
-					{% set count = film.note|length %}
-					{% for n in film.note %}
-						{% set total = total + n.noteValue %}
-					{% endfor %}
-					{% if count > 0 %}
-						{{ (total / count)|number_format(1) }}/5
+					<strong>Acteurs :</strong>
+					{% for a in film.acteur %}
+						{{ a.nom  }} {{ a.prenom}}
+						{% if not loop.last %},
+						{% endif %}
 					{% else %}
-						<em>Non noté</em>
-					{% endif %}
+						<em>Aucun acteur</em>
+					{% endfor %}
+				<p>
+{% if averageNotes is not null %}
+	{% set full = averageNotes|round(0, 'floor') %}
+	{% set half = (averageNotes - full) >= 0.5 ? 1 : 0 %}
+	{% set empty = 5 - full - half %}
+
+	<div class="mb-3">
+		<p class="fw-bold mb-1">Note moyenne :</p>
+		<span class="text-warning">
+			{% for i in 1..full %}
+				<i class="bi bi-star-fill"></i>
+			{% endfor %}
+			{% if half %}
+				<i class="bi bi-star-half"></i>
+			{% endif %}
+			{% for i in 1..empty %}
+				<i class="bi bi-star"></i>
+			{% endfor %}
+		</span>
+		<small class="text-muted">({{ averageNotes|number_format(1, '.', '') }}/5)</small>
+	</div>
+{% else %}
+	<p class="text-muted">Ce film n’a pas encore de note.</p>
+{% endif %}
+
 				</p>
 
 				<p>
@@ -63,6 +84,93 @@
 			<p>Aucun film trouvé.</p>
 		{% endfor %}
 		<hr class="hr"/>
+	</div> #}
+	<div class="container my-5">
+		<h1 class="mb-4">Liste des films</h1>
+
+		<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+			{% for film in films %}
+				<div class="col">
+					<div class="card h-100 shadow-sm border-0 rounded-4">
+						{% if film.affiche %}
+							<img src="{{ asset('assets/uploads/affiche/' ~ film.affiche) }}" class="card-img-top rounded-top-4" alt="{{ film.titre }}">
+						{% endif %}
+						<h5 class="card-title text-center">{{ film.titre }}</h5>
+						<div class="card-header bg-transparent border-0">
+							<h5 class="card-title text-center">{% set total_minutes = film.duree %}
+								{% set heures = (total_minutes // 60) %}
+								{% set minutes = (total_minutes % 60) %}
+								{{ heures }}h{{ "%02d"|format(minutes) }}min</h5>
+						</div>
+						<div class="card-body">
+							<p class="card-text">
+
+								{% set averageNote = averageNotes[film.id] ?? null %}
+
+								{% if averageNote is not null %}
+									{% set full = averageNote|round(0, 'floor') %}
+									{% set half = (averageNote - full) >= 0.5 ? 1 : 0 %}
+									{% set empty = 5 - full - half %}
+
+									<div class="mb-2 text-warning">
+										{% for i in 1..full %}
+											<i class="bi bi-star-fill"></i>
+										{% endfor %}
+										{% if half %}
+											<i class="bi bi-star-half"></i>
+										{% endif %}
+										{% for i in 1..empty %}
+											<i class="bi bi-star"></i>
+										{% endfor %}
+										<small class="text-muted ms-1">({{ averageNote|number_format(1, '.', '') }}/5)</small>
+									</div>
+								{% else %}
+									<p class="text-muted">Pas encore de note</p>
+								{% endif %}
+
+								<p class="card-text">{{ film.synopsis|u.truncate(100, '...') }}</p>
+
+								<strong>Réalisateur(s) :</strong>
+								{% for real in film.realisateur %}
+									{{ real.nom }}
+									{% if not loop.last %}, {% endif %}
+								{% else %}
+									<em>Aucun réalisateur</em>
+								{% endfor %}
+							</p>
+
+							<p class="card-text">
+								<strong>Genres :</strong>
+								{% for g in film.genre %}
+									{{ g.libelle }}
+									{% if not loop.last %}, {% endif %}
+								{% else %}
+									<em>Aucun genre</em>
+								{% endfor %}
+							</p>
+
+							<p class="card-text">
+								<strong>Acteurs :</strong>
+								{% for a in film.acteur %}
+									{{ a.nom }} {{ a.prenom }}
+									{% if not loop.last %}, {% endif %}
+								{% else %}
+									<em>Aucun acteur</em>
+								{% endfor %}
+							</p>
+							<p class="card-text">
+								<strong>Date de sortie :</strong>
+								{{ film.dateSortie|date('d/m/Y') }}
+							</p>
+							
+						</div>
+						<div class="card-footer bg-transparent border-0">
+							<a href="{{ path('app_film_detail', { id: film.id }) }}" class="btn btn-primary w-100">Voir le film</a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
 	</div>
 {% endblock %}
 
