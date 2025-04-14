@@ -1,20 +1,59 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello ProfilController!{% endblock %}
+{% block title %}Mon Compte
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+	<div class="container mt-4">
+		<div
+			class="row">
+			<!-- Menu latéral -->
+			<div class="col-md-3">
+				<div class="list-group">
+					<span class="list-group-item active">Mon Compte</span>
+					<a href="#" class="list-group-item">Films favoris</a>
+					<a href="#" class="list-group-item">Séries favorites</a>
+					<a href="#" class="list-group-item">Mes critiques</a>
+					<a href="#" class="list-group-item">Mes collections</a>
+					<a href="#" class="list-group-item">Mes amis</a>
+					<a href="#" class="list-group-item">Mes cinémas</a>
+					<a href="#" class="list-group-item active">Préférences</a>
+					<a href="#" class="list-group-item">Noter des films</a>
+				</div>
+			</div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+			<!-- Contenu principal -->
+			<div class="col-md-9">
+				<h2>Mes Préférences</h2>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/mohamedmakhloufi/Documents/ENV/workspace/repo/projetsPerso/Symfo-CineActu/src/Controller/ProfilController.php</code></li>
-        <li>Your template at <code>/Users/mohamedmakhloufi/Documents/ENV/workspace/repo/projetsPerso/Symfo-CineActu/templates/profil/index.html.twig</code></li>
-    </ul>
-</div>
+				{% for message in app.flashes('success') %}
+					<div class="alert alert-success">{{ message }}</div>
+				{% endfor %}
+
+				{{ form_start(form) }}
+				<div class="mb-3">
+					{{ form_label(form.login) }}
+					{{ form_widget(form.login, { 'attr': {'class': 'form-control'} }) }}
+					{{ form_errors(form.login) }}
+				</div>
+				<div class="mb-3">
+					{{ form_label(form.email) }}
+					{{ form_widget(form.email, { 'attr': {'class': 'form-control'} }) }}
+					{{ form_errors(form.email) }}
+				</div>
+				<div class="mb-3">
+					{{ form_label(form.genre) }}
+					{{ form_widget(form.genre, { 'attr': {'class': 'form-select'} }) }}
+					{{ form_errors(form.genre) }}
+				</div>
+				<div class="mb-3">
+					{{ form_label(form.dateNaissance) }}
+					{{ form_widget(form.dateNaissance, { 'attr': {'class': 'form-control'} }) }}
+					{{ form_errors(form.dateNaissance) }}
+				</div>
+				<button type="submit" class="btn btn-primary">Enregistrer</button>
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
 {% endblock %}
